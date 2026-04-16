@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>🔒 HTML Grabber Anti-DDoS & Anti Maling</title>
+
+  <!-- ===== ANTI DI-EMBED WEB LAIN + ANTI XSS ===== -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 script-src 'self' 'unsafe-inline';
+                 style-src 'self' 'unsafe-inline';
+                 img-src 'self' data: blob: https:;
+                 connect-src 'self' https://api.allorigins.win;
+                 frame-ancestors 'none';
+                 base-uri 'none';
+                 form-action 'none';">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+
+  <style>
+    @keyframes masuk { 0% {opacity:0; transform:translateY(30px);} 100% {opacity:1; transform:translateY(0);} }
+    @keyframes kedip { 0%,100% {opacity:1;} 50% {opacity:0.3;} }
+    @keyframes muter { 0% {transform:rotate(0deg);} 100% {transform:rotate(360deg);} }
+
+    :root { --biru:#1877f2; --ijo:#42b72a; --merah:#fa383e; --ungu:#764ba2; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px;
+      animation: masuk 0.5s ease;
+    }
+
+  .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: rgba(30,30,30,0.9);
+      backdrop-filter: blur(20px);
+      padding: 30px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 0 40px rgba(131,56,236,0.3);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.2rem;
+      background: linear-gradient(45deg, #ff006e, #8338ec, #3a86ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+  .sub { text-align: center; color: #888; margin-bottom: 25px; font-size: 13px; }
+  .warning {
+      background: rgba(250,56,62,0.15);
+      border: 1px solid var(--merah);
+      padding: 12px;
+      border-radius: 10px;
+      margin: 15px 0;
+      font-size: 14px;
+      animation: kedip 3s infinite;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid rgba(255,255,255,0.1);
+      background: rgba(0,0,0,0.3);
+      color: white;
+      border-radius: 12px;
+      font-size: 16px;
+    }
+
+    input:focus {
+      border-color: var(--ungu);
+      box-shadow: 0 0 0 3px rgba(131,56,236,0.3);
+      outline: none;
+    }
+
+  .btn {
+      background: linear-gradient(45deg, var(--ungu), #5a189a);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin: 10px 5px 10px 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+  .btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ijo { background: linear-gradient(45deg, var(--ijo), #36a420); }
+  .btn-merah { background: linear-gradient(45deg, var(--merah), #e41e3f); }
+
+  .loading {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top: 3px solid white;
+      border-radius: 50%;
+      animation: muter 0.8s linear infinite;
+    }
+
+    #fiturUtama { display: none; margin-top: 25px; }
+    #hasil { margin-top: 20px; display: none; }
+
+    #outputHTML {
+      background: #000;
+      color: #0f0;
+      padding: 15px;
+      border-radius: 12px;
+      max-height: 450px;
+      overflow: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      border: 1px solid var(--ijo);
+    }
+
+  .preview {
+      background: white;
+      color: black;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 15px;
+      max-height: 500px;
+      overflow: auto;
+      display: none;
+    }
+
+  .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #1c1e21;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-weight: bold;
+      opacity: 0;
+      transition: all 0.4s;
+      z-index: 9999;
+      border: 1px solid var(--ungu);
+    }
+
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    #tombolRahasia {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: linear-gradient(45deg, #ff006e, #8338ec);
+      color: white;
+      border: none;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      font-size: 28px;
+      cursor: pointer;
+      box-shadow: 0 0 30px rgba(255,0,110,0.6);
+      display: none;
+      z-index: 1000;
+    }
+
+  .status {
+      padding: 12px;
+      border-radius: 8px;
+      margin: 15px 0;
+      font-size: 14px;
+      text-align: center;
+      display: none;
+    }
+  .status.error { background: rgba(250,56,62,0.2); border: 1px solid var(--merah); }
+  .status.success { background: rgba(66,183,42,0.2); border: 1px solid var(--ijo); }
+  .status.warn { background: rgba(255,193,7,0.2); border: 1px solid #ffc107; color: #ffc107; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🛡️ HTML Grabber Anti Maling</h1>
+    <p class="sub">Tap 3x pake 3 jari buat buka tools | Rate limited: 5x per menit</p>
+
+    <div class="warning">
+      ⚠️ <strong>PROTECTION AKTIF:</strong> Website ini nggak bisa di-embed iframe, nggak bisa di-clone tools lain, ada rate limit anti-spam.
+    </div>
+
+    <div id="fiturUtama">
+      <input type="url" id="inputURL" placeholder="https://target-website.com">
+
+      <div>
+        <button class="btn" id="btnAmbil">
+          <span id="btnText">📥 Ambil HTML</span>
+        </button>
+        <button class="btn btn-ungu" id="btnToggle" style="display:none;">👁️ Toggle Preview</button>
+      </div>
+
+      <div class="status" id="status"></div>
+
+      <div id="hasil">
+        <h3>✅ HTML Berhasil Diambil:</h3>
+        <div id="outputHTML"></div>
+        <div>
+          <button class="btn btn-ijo" id="btnSalin">📋 Salin</button>
+          <button class="btn btn-merah" id="btnDownload">💾 Download</button>
+        </div>
+        <div class="preview" id="preview"></div>
+      </div>
+    </div>
+  </div>
+
+  <button id="tombolRahasia" title="Buka Tools">🤫</button>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ===== ANTI DI-EMBED IFRAME =====
+    if (window.top!== window.self) {
+      document.body.innerHTML = '<h1 style="color:red;text-align:center;margin-top:50px;">⛔ GABOLEH DI-EMBED!</h1>';
+      throw new Error('Blocked');
+    }
+
+    // ===== ANTI BOT: CEK MOUSE/TOUCH =====
+    let isHuman = false;
+    ['mousemove', 'touchstart', 'keydown'].forEach(evt => {
+      document.addEventListener(evt, () => { isHuman = true; }, { once: true });
+    });
+
+    const inputURL = document.getElementById('inputURL');
+    const btnAmbil = document.getElementById('btnAmbil');
+    const btnText = document.getElementById('btnText');
+    const btnToggle = document.getElementById('btnToggle');
+    const hasil = document.getElementById('hasil');
+    const outputHTML = document.getElementById('outputHTML');
+    const preview = document.getElementById('preview');
+    const btnSalin = document.getElementById('btnSalin');
+    const btnDownload = document.getElementById('btnDownload');
+    const tombolRahasia = document.getElementById('tombolRahasia');
+    const fiturUtama = document.getElementById('fiturUtama');
+    const status = document.getElementById('status');
+    const toast = document.getElementById('toast');
+
+    let htmlData = '';
+    let previewNyala = true;
+    let fiturKebuka = false;
+
+    // ===== RATE LIMIT: MAX 5X PER MENIT =====
+    function cekRateLimit() {
+      const sekarang = Date.now();
+      const riwayat = JSON.parse(localStorage.getItem('req_log') || '[]');
+      const semenitLalu = sekarang - 60000;
+      const reqBaru = riwayat.filter(t => t > semenitLalu);
+
+      if (reqBaru.length >= 5) {
+        const tunggu = Math.ceil((reqBaru[0] + 60000 - sekarang) / 1000);
+        throw new Error(`Rate limit! Tunggu ${tunggu} detik`);
+      }
+
+      reqBaru.push(sekarang);
+      localStorage.setItem('req_log', JSON.stringify(reqBaru));
+    }
+
+    // ===== AMBIL HTML =====
+    btnAmbil.addEventListener('click', async () => {
+      if (!isHuman) {
+        showStatus('Deteksi bot! Gerakin mouse dulu', 'error');
+        return;
+      }
+
+      const url = inputURL.value.trim();
+      if (!url.startsWith('http')) {
+        showStatus('URL harus pake https://', 'error');
+        return;
+      }
+
+      try {
+        cekRateLimit(); // Cek spam dulu
+      } catch (e) {
+        showStatus(e.message, 'warn');
+        return;
+      }
+
+      btnAmbil.disabled = true;
+      btnText.innerHTML = '<span class="loading"></span> Mohon tunggu sebentar...';
+      showStatus('Mengambil HTML...', 'success');
+      hasil.style.display = 'none';
+
+      try {
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+        const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(10000) });
+        const data = await res.json();
+        if (!data.contents) throw new Error('Konten kosong');
+
+        htmlData = data.contents;
+        outputHTML.textContent = htmlData;
+        preview.innerHTML = htmlData;
+
+        hasil.style.display = 'block';
+        preview.style.display = 'block';
+        btnToggle.style.display = 'inline-flex';
+        showStatus('Sukses! HTML diambil ✅', 'success');
+
+      } catch (err) {
+        showStatus('Gagal: ' + err.message, 'error');
+      } finally {
+        btnAmbil.disabled = false;
+        btnText.innerHTML = '📥 Ambil HTML';
+      }
+    });
+
+    btnToggle.addEventListener('click', () => {
+      previewNyala =!previewNyala;
+      preview.style.display = previewNyala? 'block' : 'none';
+      btnToggle.innerHTML = previewNyala? '👁️ Matiin Preview' : '👁️ Nyalain Preview';
+    });
+
+    btnSalin.addEventListener('click', () => {
+      navigator.clipboard.writeText(htmlData).then(() => showToast('Disalin! 📋'));
+    });
+
+    btnDownload.addEventListener('click', () => {
+      const blob = new Blob([htmlData], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'grabbed.html';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Didownload! 💾');
+    });
+
+    // ===== TOMBOL RAHASIA 3 JARI 3X TAP =====
+    let tapCount = 0, lastTap = 0;
+    document.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 3) {
+        const now = Date.now();
+        tapCount = (now - lastTap < 600)? tapCount + 1 : 1;
+        lastTap = now;
+        if (tapCount >= 3) {
+          tapCount = 0;
+          tombolRahasia.style.display = tombolRahasia.style.display === 'none'? 'block' : 'none';
+          showToast(tombolRahasia.style.display === 'block'? '🤫 Tools dibuka!' : 'Tools dikunci');
+          if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        }
+      }
+    });
+
+    tombolRahasia.addEventListener('click', () => {
+      fiturKebuka =!fiturKebuka;
+      fiturUtama.style.display = fiturKebuka? 'block' : 'none';
+      showToast(fiturKebuka? 'Tools aktif 🔓' : 'Tools off 🔒');
+    });
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    function showStatus(msg, type) {
+      status.textContent = msg;
+      status.className = 'status ' + type;
+      status.style.display = 'block';
+      setTimeout(() => status.style.display = 'none', 4000);
+    }
+
+    // Anti klik kanan + anti F12 basic
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+      if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+        e.preventDefault();
+        showToast('⛔ DevTools diblokir');
+      }
+    });
+  </script>
+</body>
+</html>
